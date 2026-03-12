@@ -147,6 +147,7 @@ const translations = {
       downgradeToFree: "Downgrade to Free",
       makeAdmin: "Make Admin",
       removeAdmin: "Remove Admin",
+      refresh: "Refresh",
     },
     dashboard: {
       title: "Dashboard",
@@ -326,6 +327,7 @@ const translations = {
       downgradeToFree: "Понизить до Бесплатного",
       makeAdmin: "Сделать администратором",
       removeAdmin: "Убрать администратора",
+      refresh: "Обновить",
     },
     dashboard: {
       title: "Личный кабинет",
@@ -505,6 +507,7 @@ const translations = {
       downgradeToFree: "Hạ xuống Miễn phí",
       makeAdmin: "Đặt làm Admin",
       removeAdmin: "Xóa Admin",
+      refresh: "Làm mới",
     },
     dashboard: {
       title: "Bảng điều khiển",

@@ -18,7 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Shield, Users, Bike, CreditCard, CheckCircle2, XCircle, Clock,
   TrendingUp, Eye, Star, AlertTriangle, MoreVertical, UserCog,
-  Crown, UserMinus, ChevronUp, ChevronDown, MapPin, Zap, Fuel,
+  Crown, UserMinus, ChevronDown, MapPin, Zap, Fuel, RefreshCw,
 } from "lucide-react";
 import { Link } from "wouter";
 import type { VehicleWithOwner, PaymentWithUser } from "@shared/schema";
@@ -34,17 +34,32 @@ export default function Admin() {
   if (!user) { navigate("/login"); return null; }
   if (user.role !== "admin") { navigate("/"); return null; }
 
-  const { data: stats } = useQuery<any>({ queryKey: ["/api/admin/stats"] });
-  const { data: vehicles, isLoading: vehiclesLoading } = useQuery<VehicleWithOwner[]>({
+  const freshOpts = { staleTime: 0, refetchOnMount: true } as const;
+
+  const { data: stats, refetch: refetchStats } = useQuery<any>({
+    queryKey: ["/api/admin/stats"],
+    ...freshOpts,
+  });
+  const { data: vehicles, isLoading: vehiclesLoading, refetch: refetchVehicles } = useQuery<VehicleWithOwner[]>({
     queryKey: ["/api/vehicles/admin", vehicleFilter],
-    queryFn: () => fetch(`/api/vehicles/admin?status=${vehicleFilter}`).then(r => r.json()),
+    queryFn: () => fetch(`/api/vehicles/admin?status=${vehicleFilter}`, { credentials: "include" }).then(r => r.json()),
+    ...freshOpts,
   });
-  const { data: payments, isLoading: paymentsLoading } = useQuery<PaymentWithUser[]>({
+  const { data: payments, isLoading: paymentsLoading, refetch: refetchPayments } = useQuery<PaymentWithUser[]>({
     queryKey: ["/api/payments/admin"],
+    ...freshOpts,
   });
-  const { data: allUsers, isLoading: usersLoading } = useQuery<any[]>({
+  const { data: allUsers, isLoading: usersLoading, refetch: refetchUsers } = useQuery<any[]>({
     queryKey: ["/api/admin/users"],
+    ...freshOpts,
   });
+
+  const refreshAll = () => {
+    refetchStats();
+    refetchVehicles();
+    refetchPayments();
+    refetchUsers();
+  };
 
   const updateVehicleMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: Record<string, any> }) =>
@@ -105,10 +120,20 @@ export default function Admin() {
           <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
             <Shield size={20} className="text-primary" />
           </div>
-          <div>
+          <div className="flex-1">
             <h1 className="text-2xl font-bold">{t.admin.title}</h1>
             <p className="text-sm text-muted-foreground">{t.admin.subtitle}</p>
           </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={refreshAll}
+            className="gap-2"
+            data-testid="admin-refresh"
+          >
+            <RefreshCw size={14} />
+            {t.admin.refresh ?? "Refresh"}
+          </Button>
         </div>
 
         {/* Stats */}
