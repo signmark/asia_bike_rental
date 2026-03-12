@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { users, vehicles, bookings, payments } from "@shared/schema";
+import { users, vehicles, bookings, payments, passwordResetTokens } from "@shared/schema";
 import { eq, and, ne, count, desc, or, ilike } from "drizzle-orm";
 import type {
   User, InsertUser, Vehicle, InsertVehicle,
@@ -32,6 +32,11 @@ export interface IStorage {
   getAllBookings(): Promise<BookingWithDetails[]>;
   createBooking(renterId: string, booking: InsertBooking): Promise<Booking>;
   updateBooking(id: string, data: Partial<Booking>): Promise<Booking>;
+
+  // Password reset
+  createResetToken(userId: string, token: string, expiresAt: Date): Promise<void>;
+  getResetToken(token: string): Promise<{ id: string; userId: string; expiresAt: Date; used: boolean } | undefined>;
+  markResetTokenUsed(id: string): Promise<void>;
 
   // Payments
   getPayment(id: string): Promise<PaymentWithUser | undefined>;
@@ -182,6 +187,20 @@ export class DatabaseStorage implements IStorage {
   async updateBooking(id: string, data: Partial<Booking>): Promise<Booking> {
     const [b] = await db.update(bookings).set(data).where(eq(bookings.id, id)).returning();
     return b;
+  }
+
+  async createResetToken(userId: string, token: string, expiresAt: Date): Promise<void> {
+    await db.insert(passwordResetTokens).values({ userId, token, expiresAt });
+  }
+
+  async getResetToken(token: string): Promise<{ id: string; userId: string; expiresAt: Date; used: boolean } | undefined> {
+    const [row] = await db.select().from(passwordResetTokens).where(eq(passwordResetTokens.token, token));
+    if (!row) return undefined;
+    return { id: row.id, userId: row.userId, expiresAt: row.expiresAt, used: row.used };
+  }
+
+  async markResetTokenUsed(id: string): Promise<void> {
+    await db.update(passwordResetTokens).set({ used: true }).where(eq(passwordResetTokens.id, id));
   }
 
   async getPayment(id: string): Promise<PaymentWithUser | undefined> {

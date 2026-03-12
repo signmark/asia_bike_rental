@@ -14,6 +14,8 @@ import Dashboard from "@/pages/dashboard";
 import AddVehicle from "@/pages/add-vehicle";
 import Upgrade from "@/pages/upgrade";
 import Admin from "@/pages/admin";
+import ForgotPassword from "@/pages/forgot-password";
+import ResetPassword from "@/pages/reset-password";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -28,6 +30,8 @@ function Router() {
       <Route path="/edit-vehicle/:id" component={AddVehicle} />
       <Route path="/upgrade" component={Upgrade} />
       <Route path="/admin" component={Admin} />
+      <Route path="/forgot-password" component={ForgotPassword} />
+      <Route path="/reset-password" component={ResetPassword} />
       <Route component={NotFound} />
     </Switch>
   );

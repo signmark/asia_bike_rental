@@ -17,5 +17,14 @@ export async function initDatabase() {
       CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE
     ) WITH (OIDS=FALSE);
     CREATE INDEX IF NOT EXISTS "IDX_session_expire" ON "session" ("expire");
+
+    CREATE TABLE IF NOT EXISTS "password_reset_tokens" (
+      "id" varchar PRIMARY KEY DEFAULT gen_random_uuid(),
+      "user_id" varchar NOT NULL REFERENCES users(id),
+      "token" text NOT NULL UNIQUE,
+      "expires_at" timestamp NOT NULL,
+      "used" boolean NOT NULL DEFAULT false,
+      "created_at" timestamp NOT NULL DEFAULT now()
+    );
   `);
 }

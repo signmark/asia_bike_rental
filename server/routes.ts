@@ -89,6 +89,62 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     }
   });
 
+  // Forgot password — generate token, return reset link (no email service)
+  app.post("/api/auth/forgot-password", async (req, res) => {
+    try {
+      const { email } = req.body;
+      if (!email) return res.status(400).json({ error: "Email required" });
+
+      const user = await storage.getUserByEmail(email);
+      // Always respond OK — don't reveal if email exists
+      if (!user) return res.json({ ok: true });
+
+      const token = crypto.randomBytes(32).toString("hex");
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+      await storage.createResetToken(user.id, token, expiresAt);
+
+      // Return token directly (no email service — caller shows the link)
+      res.json({ ok: true, token });
+    } catch (e: any) {
+      res.status(500).json({ error: e.message });
+    }
+  });
+
+  // Verify reset token
+  app.get("/api/auth/reset-password/:token", async (req, res) => {
+    try {
+      const row = await storage.getResetToken(req.params.token);
+      if (!row || row.used || row.expiresAt < new Date()) {
+        return res.status(400).json({ valid: false });
+      }
+      res.json({ valid: true });
+    } catch (e: any) {
+      res.status(500).json({ error: e.message });
+    }
+  });
+
+  // Reset password with token
+  app.post("/api/auth/reset-password", async (req, res) => {
+    try {
+      const { token, password } = req.body;
+      if (!token || !password || password.length < 6) {
+        return res.status(400).json({ error: "Invalid request" });
+      }
+
+      const row = await storage.getResetToken(token);
+      if (!row || row.used || row.expiresAt < new Date()) {
+        return res.status(400).json({ error: "Token invalid or expired" });
+      }
+
+      await storage.updateUser(row.userId, { password: hashPassword(password) });
+      await storage.markResetTokenUsed(row.id);
+
+      res.json({ ok: true });
+    } catch (e: any) {
+      res.status(500).json({ error: e.message });
+    }
+  });
+
   app.post("/api/auth/logout", (req, res) => {
     req.session.destroy(() => {});
     res.json({ ok: true });

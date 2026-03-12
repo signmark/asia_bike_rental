@@ -97,13 +97,16 @@ export default function Login() {
               </Button>
             </form>
 
-            <div className="mt-4 text-center">
-              <div className="text-sm text-muted-foreground">
+            <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
+              <span>
                 {t.login.noAccount}{" "}
                 <Link href="/register">
                   <a className="text-primary hover:underline font-medium">{t.login.createOne}</a>
                 </Link>
-              </div>
+              </span>
+              <Link href="/forgot-password">
+                <a className="text-primary hover:underline" data-testid="link-forgot-password">{t.login.forgotPassword}</a>
+              </Link>
             </div>
 
             <div className="mt-4 pt-4 border-t border-border">
