@@ -1,0 +1,22 @@
+oot@oladaymbzh:~/bike# psql -U postgres -c "CREATE DATABASE bikes;"
+Warning: No existing cluster is suitable as a default target. Please see man pg_wrapper(1) how to specify one.
+Error: You must install at least one postgresql-client-<version> package
+root@oladaymbzh:~/bike# docker ps
+CONTAINER ID   IMAGE                                COMMAND                  CREATED       STATUS                 PORTS                                                    
+                      NAMES
+0212fc1091db   ghcr.io/coollabsio/sentinel:0.0.19   "/app/sentinel"          2 hours ago   Up 2 hours (healthy)                                                            
+                      coolify-sentinel
+98c535044ff5   2c21562ac185                         "docker-entrypoint.s…"   7 days ago    Up About an hour       5000/tcp                                                 
+                      smm_app
+b0a5abf5191e   directus/directus:11.2.2             "docker-entrypoint.s…"   2 weeks ago   Up 2 hours             8055/tcp                                                 
+                      directus
+a9a392879545   root-n8n                             "docker-entrypoint.s…"   5 weeks ago   Up 2 hours             5678/tcp                                                 
+                      n8n
+eb2837830eac   postgres:16                          "docker-entrypoint.s…"   5 weeks ago   Up 2 hours             5432/tcp                                                 
+                      postgres
+7075c52753db   nginx:alpine                         "/docker-entrypoint.…"   5 weeks ago   Up 2 hours             80/tcp                                                   
+                      smmniap_static
+a89e2721c9ac   traefik:v2.11                        "/entrypoint.sh --ap…"   5 weeks ago   Up 2 hours             0.0.0.0:80->80/tcp, [::]:80->80/tcp, 0.0.0.0:443->443/tcp, [::]:443->443/tcp   traefik
+5786063ab28c   dpage/pgadmin4                       "/entrypoint.sh"         5 weeks ago   Up 2 hours             80/tcp, 443/tcp                                          
+                      root-pgadmin-1
+root@oladaymbzh:~/bike# 
