@@ -1,5 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/lib/auth";
+import { useLang, langFlags, langLabels, type Lang } from "@/lib/language";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -10,17 +11,20 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Bike, LayoutDashboard, LogOut, Settings, Shield, Star, Menu, X } from "lucide-react";
+import { Bike, LayoutDashboard, LogOut, Shield, Star, Menu, X, Globe } from "lucide-react";
 import { useState } from "react";
 
 export function Navbar() {
   const { user, logout } = useAuth();
+  const { lang, setLang, t } = useLang();
   const [location] = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const initials = user?.displayName
     ? user.displayName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
     : user?.username?.slice(0, 2).toUpperCase() ?? "?";
+
+  const langs: Lang[] = ["en", "ru", "vi"];
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur-md">
@@ -43,32 +47,55 @@ export function Navbar() {
           <div className="hidden md:flex items-center gap-1">
             <Link href="/">
               <a className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${location === "/" ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`} data-testid="nav-marketplace">
-                Marketplace
+                {t.nav.marketplace}
               </a>
             </Link>
             {user && (
               <Link href="/dashboard">
                 <a className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${location.startsWith("/dashboard") ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`} data-testid="nav-dashboard">
-                  Dashboard
+                  {t.nav.dashboard}
                 </a>
               </Link>
             )}
             {user?.role === "admin" && (
               <Link href="/admin">
                 <a className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${location.startsWith("/admin") ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`} data-testid="nav-admin">
-                  Admin
+                  {t.nav.admin}
                 </a>
               </Link>
             )}
           </div>
 
           {/* Right side */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            {/* Language switcher */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors" data-testid="button-lang">
+                  <Globe size={14} />
+                  <span>{langLabels[lang]}</span>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-32">
+                {langs.map(l => (
+                  <DropdownMenuItem
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className={`gap-2 ${lang === l ? "bg-accent font-medium" : ""}`}
+                    data-testid={`lang-${l}`}
+                  >
+                    <span>{langFlags[l]}</span>
+                    <span>{langLabels[l]}</span>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             {user ? (
               <>
                 <Link href="/add-vehicle">
                   <Button size="sm" className="hidden sm:flex" data-testid="button-add-vehicle">
-                    + List Vehicle
+                    {t.nav.listVehicle}
                   </Button>
                 </Link>
                 <DropdownMenu>
@@ -94,31 +121,31 @@ export function Navbar() {
                     <DropdownMenuSeparator />
                     <Link href="/dashboard">
                       <DropdownMenuItem data-testid="menu-dashboard">
-                        <LayoutDashboard size={14} className="mr-2" /> Dashboard
+                        <LayoutDashboard size={14} className="mr-2" /> {t.nav.dashboard}
                       </DropdownMenuItem>
                     </Link>
                     <Link href="/add-vehicle">
                       <DropdownMenuItem data-testid="menu-add-vehicle">
-                        <Bike size={14} className="mr-2" /> List a Vehicle
+                        <Bike size={14} className="mr-2" /> {t.nav.listVehicleMenu}
                       </DropdownMenuItem>
                     </Link>
                     {user.subscriptionStatus !== "business" && (
                       <Link href="/upgrade">
                         <DropdownMenuItem className="text-amber-600 dark:text-amber-400" data-testid="menu-upgrade">
-                          <Star size={14} className="mr-2" /> Upgrade to Business
+                          <Star size={14} className="mr-2" /> {t.nav.upgrade}
                         </DropdownMenuItem>
                       </Link>
                     )}
                     {user.role === "admin" && (
                       <Link href="/admin">
                         <DropdownMenuItem data-testid="menu-admin">
-                          <Shield size={14} className="mr-2" /> Admin Panel
+                          <Shield size={14} className="mr-2" /> {t.nav.adminPanel}
                         </DropdownMenuItem>
                       </Link>
                     )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={logout} className="text-destructive" data-testid="menu-logout">
-                      <LogOut size={14} className="mr-2" /> Logout
+                      <LogOut size={14} className="mr-2" /> {t.nav.logout}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -126,10 +153,10 @@ export function Navbar() {
             ) : (
               <div className="flex items-center gap-2">
                 <Link href="/login">
-                  <Button variant="ghost" size="sm" data-testid="button-login">Login</Button>
+                  <Button variant="ghost" size="sm" data-testid="button-login">{t.nav.login}</Button>
                 </Link>
                 <Link href="/register">
-                  <Button size="sm" data-testid="button-register">Sign Up Free</Button>
+                  <Button size="sm" data-testid="button-register">{t.nav.signUp}</Button>
                 </Link>
               </div>
             )}
@@ -148,21 +175,21 @@ export function Navbar() {
         {mobileOpen && (
           <div className="md:hidden border-t border-border py-3 space-y-1">
             <Link href="/" onClick={() => setMobileOpen(false)}>
-              <a className="block px-4 py-2.5 text-sm rounded-md hover:bg-accent">Marketplace</a>
+              <a className="block px-4 py-2.5 text-sm rounded-md hover:bg-accent">{t.nav.marketplace}</a>
             </Link>
             {user && (
               <Link href="/dashboard" onClick={() => setMobileOpen(false)}>
-                <a className="block px-4 py-2.5 text-sm rounded-md hover:bg-accent">Dashboard</a>
+                <a className="block px-4 py-2.5 text-sm rounded-md hover:bg-accent">{t.nav.dashboard}</a>
               </Link>
             )}
             {user && (
               <Link href="/add-vehicle" onClick={() => setMobileOpen(false)}>
-                <a className="block px-4 py-2.5 text-sm rounded-md hover:bg-accent">+ List Vehicle</a>
+                <a className="block px-4 py-2.5 text-sm rounded-md hover:bg-accent">{t.nav.listVehicle}</a>
               </Link>
             )}
             {user?.role === "admin" && (
               <Link href="/admin" onClick={() => setMobileOpen(false)}>
-                <a className="block px-4 py-2.5 text-sm rounded-md hover:bg-accent">Admin Panel</a>
+                <a className="block px-4 py-2.5 text-sm rounded-md hover:bg-accent">{t.nav.adminPanel}</a>
               </Link>
             )}
           </div>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/lib/auth";
+import { useLang } from "@/lib/language";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +11,7 @@ import { Bike, Loader2, AlertCircle } from "lucide-react";
 
 export default function Login() {
   const { login } = useAuth();
+  const { t } = useLang();
   const [, navigate] = useLocation();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -24,7 +26,7 @@ export default function Login() {
       await login(username, password);
       navigate("/");
     } catch (err: any) {
-      setError(err.message || "Invalid credentials");
+      setError(err.message || t.login.invalidCredentials);
     } finally {
       setIsLoading(false);
     }
@@ -33,7 +35,6 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/">
             <a className="inline-flex items-center gap-2.5 hover:opacity-80 transition-opacity">
@@ -49,8 +50,8 @@ export default function Login() {
 
         <Card className="border border-card-border shadow-lg">
           <CardHeader className="space-y-1 pb-4">
-            <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
-            <CardDescription>Sign in to your account to continue</CardDescription>
+            <CardTitle className="text-2xl font-bold">{t.login.welcome}</CardTitle>
+            <CardDescription>{t.login.subtitle}</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -62,11 +63,11 @@ export default function Login() {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
+                <Label htmlFor="username">{t.login.username}</Label>
                 <Input
                   id="username"
                   type="text"
-                  placeholder="Enter your username"
+                  placeholder={t.login.usernamePlaceholder}
                   value={username}
                   onChange={e => setUsername(e.target.value)}
                   required
@@ -76,11 +77,11 @@ export default function Login() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t.login.password}</Label>
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Enter your password"
+                  placeholder={t.login.passwordPlaceholder}
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   required
@@ -89,32 +90,24 @@ export default function Login() {
                 />
               </div>
 
-              <Button
-                type="submit"
-                className="w-full h-11"
-                disabled={isLoading}
-                data-testid="button-submit-login"
-              >
+              <Button type="submit" className="w-full h-11" disabled={isLoading} data-testid="button-submit-login">
                 {isLoading ? (
-                  <><Loader2 size={16} className="mr-2 animate-spin" /> Signing in...</>
-                ) : (
-                  "Sign In"
-                )}
+                  <><Loader2 size={16} className="mr-2 animate-spin" /> {t.login.signingIn}</>
+                ) : t.login.signIn}
               </Button>
             </form>
 
             <div className="mt-4 text-center">
               <div className="text-sm text-muted-foreground">
-                Don't have an account?{" "}
+                {t.login.noAccount}{" "}
                 <Link href="/register">
-                  <a className="text-primary hover:underline font-medium">Create one free</a>
+                  <a className="text-primary hover:underline font-medium">{t.login.createOne}</a>
                 </Link>
               </div>
             </div>
 
-            {/* Demo credentials */}
             <div className="mt-4 pt-4 border-t border-border">
-              <p className="text-xs text-muted-foreground text-center mb-2">Demo accounts:</p>
+              <p className="text-xs text-muted-foreground text-center mb-2">{t.login.demo}</p>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"

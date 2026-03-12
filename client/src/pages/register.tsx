@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
+import { useLang } from "@/lib/language";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,15 +11,11 @@ import { apiRequest } from "@/lib/queryClient";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function Register() {
+  const { t } = useLang();
   const [, navigate] = useLocation();
   const queryClient = useQueryClient();
   const [form, setForm] = useState({
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    displayName: "",
-    phone: "",
+    username: "", email: "", password: "", confirmPassword: "", displayName: "", phone: "",
   });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -29,16 +26,8 @@ export default function Register() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
-    if (form.password !== form.confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-    if (form.password.length < 6) {
-      setError("Password must be at least 6 characters");
-      return;
-    }
-
+    if (form.password !== form.confirmPassword) { setError(t.register.passNoMatch); return; }
+    if (form.password.length < 6) { setError(t.register.passShort); return; }
     setIsLoading(true);
     try {
       await apiRequest("POST", "/api/auth/register", {
@@ -51,7 +40,7 @@ export default function Register() {
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
       navigate("/");
     } catch (err: any) {
-      let msg = err?.message || "Registration failed";
+      let msg = err?.message || t.register.failed;
       try {
         const jsonStr = msg.substring(msg.indexOf("{"));
         const parsed = JSON.parse(jsonStr);
@@ -68,7 +57,6 @@ export default function Register() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/">
             <a className="inline-flex items-center gap-2.5 hover:opacity-80 transition-opacity">
@@ -84,8 +72,8 @@ export default function Register() {
 
         <Card className="border border-card-border shadow-lg">
           <CardHeader className="space-y-1 pb-4">
-            <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
-            <CardDescription>Start renting and listing vehicles for free</CardDescription>
+            <CardTitle className="text-2xl font-bold">{t.register.title}</CardTitle>
+            <CardDescription>{t.register.subtitle}</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -98,79 +86,37 @@ export default function Register() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="displayName">Full Name</Label>
-                  <Input
-                    id="displayName"
-                    placeholder="Alex Johnson"
-                    value={form.displayName}
-                    onChange={update("displayName")}
-                    className="h-11"
-                    data-testid="input-display-name"
-                  />
+                  <Label htmlFor="displayName">{t.register.fullName}</Label>
+                  <Input id="displayName" placeholder="Alex Johnson" value={form.displayName} onChange={update("displayName")} className="h-11" data-testid="input-display-name" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone (optional)</Label>
-                  <Input
-                    id="phone"
-                    placeholder="+84 ..."
-                    value={form.phone}
-                    onChange={update("phone")}
-                    className="h-11"
-                    data-testid="input-phone"
-                  />
+                  <Label htmlFor="phone">{t.register.phone}</Label>
+                  <Input id="phone" placeholder="+84 ..." value={form.phone} onChange={update("phone")} className="h-11" data-testid="input-phone" />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="username">Username <span className="text-destructive">*</span></Label>
-                <Input
-                  id="username"
-                  placeholder="Choose a unique username"
-                  value={form.username}
-                  onChange={update("username")}
-                  required
-                  minLength={3}
-                  className="h-11"
-                  data-testid="input-username"
-                />
+                <Label htmlFor="username">{t.register.username} <span className="text-destructive">*</span></Label>
+                <Input id="username" placeholder={t.register.usernamePlaceholder} value={form.username} onChange={update("username")} required minLength={3} className="h-11" data-testid="input-username" />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email">Email <span className="text-destructive">*</span></Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  value={form.email}
-                  onChange={update("email")}
-                  required
-                  className="h-11"
-                  data-testid="input-email"
-                />
+                <Label htmlFor="email">{t.register.email} <span className="text-destructive">*</span></Label>
+                <Input id="email" type="email" placeholder={t.register.emailPlaceholder} value={form.email} onChange={update("email")} required className="h-11" data-testid="input-email" />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Password <span className="text-destructive">*</span></Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Min. 6 characters"
-                  value={form.password}
-                  onChange={update("password")}
-                  required
-                  minLength={6}
-                  className="h-11"
-                  data-testid="input-password"
-                />
+                <Label htmlFor="password">{t.register.password} <span className="text-destructive">*</span></Label>
+                <Input id="password" type="password" placeholder={t.register.passwordPlaceholder} value={form.password} onChange={update("password")} required minLength={6} className="h-11" data-testid="input-password" />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password <span className="text-destructive">*</span></Label>
+                <Label htmlFor="confirmPassword">{t.register.confirmPassword} <span className="text-destructive">*</span></Label>
                 <div className="relative">
                   <Input
                     id="confirmPassword"
                     type="password"
-                    placeholder="Repeat password"
+                    placeholder={t.register.confirmPlaceholder}
                     value={form.confirmPassword}
                     onChange={update("confirmPassword")}
                     required
@@ -179,42 +125,29 @@ export default function Register() {
                   />
                   {form.confirmPassword && (
                     <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                      {passwordMatch ? (
-                        <CheckCircle2 size={16} className="text-emerald-500" />
-                      ) : (
-                        <AlertCircle size={16} className="text-destructive" />
-                      )}
+                      {passwordMatch ? <CheckCircle2 size={16} className="text-emerald-500" /> : <AlertCircle size={16} className="text-destructive" />}
                     </div>
                   )}
                 </div>
               </div>
 
-              <Button
-                type="submit"
-                className="w-full h-11"
-                disabled={isLoading}
-                data-testid="button-submit-register"
-              >
+              <Button type="submit" className="w-full h-11" disabled={isLoading} data-testid="button-submit-register">
                 {isLoading ? (
-                  <><Loader2 size={16} className="mr-2 animate-spin" /> Creating account...</>
-                ) : (
-                  "Create Free Account"
-                )}
+                  <><Loader2 size={16} className="mr-2 animate-spin" /> {t.register.creating}</>
+                ) : t.register.createBtn}
               </Button>
             </form>
 
             <div className="mt-4 text-center text-sm text-muted-foreground">
-              Already have an account?{" "}
+              {t.register.haveAccount}{" "}
               <Link href="/login">
-                <a className="text-primary hover:underline font-medium">Sign in</a>
+                <a className="text-primary hover:underline font-medium">{t.register.signIn}</a>
               </Link>
             </div>
           </CardContent>
         </Card>
 
-        <p className="text-center text-xs text-muted-foreground mt-4 px-4">
-          Free accounts include 1 vehicle listing. Upgrade to Business for unlimited listings.
-        </p>
+        <p className="text-center text-xs text-muted-foreground mt-4 px-4">{t.register.freePlan}</p>
       </div>
     </div>
   );
