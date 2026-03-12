@@ -31,13 +31,21 @@ function requireAdmin(req: Request, res: Response, next: Function) {
 export async function registerRoutes(httpServer: Server, app: Express): Promise<Server> {
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
+  const isProd = process.env.NODE_ENV === "production";
+
   app.use(
     session({
-      store: new PgSession({ pool }),
+      store: new PgSession({ pool, createTableIfMissing: true }),
       secret: process.env.SESSION_SECRET || "rentmybike-secret-key",
       resave: false,
       saveUninitialized: false,
-      cookie: { secure: false, maxAge: 30 * 24 * 60 * 60 * 1000 },
+      name: "rmb.sid",
+      cookie: {
+        secure: isProd,   // true in prod (Traefik terminates HTTPS → sets X-Forwarded-Proto)
+        httpOnly: true,
+        sameSite: "lax",
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      },
     })
   );
 
