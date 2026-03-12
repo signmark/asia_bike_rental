@@ -43,20 +43,26 @@ export default function Dashboard() {
 
   if (!user) { navigate("/login"); return null; }
 
-  const { data: myVehicles, isLoading: vehiclesLoading } = useQuery<VehicleWithOwner[]>({
-    queryKey: ["/api/vehicles", "mine"],
-    queryFn: () => {
-      const params = new URLSearchParams({ ownerId: user.id });
-      return fetch(`/api/vehicles?${params}`).then(r => r.json());
+  const { data: myVehicles = [], isLoading: vehiclesLoading } = useQuery<VehicleWithOwner[]>({
+    queryKey: ["/api/vehicles", "mine", user?.id],
+    queryFn: async () => {
+      const params = new URLSearchParams({ ownerId: user!.id });
+      const r = await fetch(`/api/vehicles?${params}`, { credentials: "include" });
+      if (!r.ok) return [];
+      const data = await r.json();
+      return Array.isArray(data) ? data : [];
     },
+    enabled: !!user,
   });
 
-  const { data: myBookings, isLoading: bookingsLoading } = useQuery<BookingWithDetails[]>({
+  const { data: myBookings = [], isLoading: bookingsLoading } = useQuery<BookingWithDetails[]>({
     queryKey: ["/api/bookings/my"],
+    enabled: !!user,
   });
 
-  const { data: receivedBookings, isLoading: receivedLoading } = useQuery<BookingWithDetails[]>({
+  const { data: receivedBookings = [], isLoading: receivedLoading } = useQuery<BookingWithDetails[]>({
     queryKey: ["/api/bookings/owner"],
+    enabled: !!user,
   });
 
   const deleteMutation = useMutation({
@@ -78,10 +84,11 @@ export default function Dashboard() {
     },
   });
 
-  const activeVehicles = myVehicles?.filter(v => v.status === "active").length ?? 0;
-  const pendingBookingsCount = receivedBookings?.filter(b => b.status === "pending").length ?? 0;
-  const totalEarnings = receivedBookings?.filter(b => b.status === "confirmed" || b.status === "completed")
-    .reduce((sum, b) => sum + Number(b.totalPrice), 0) ?? 0;
+  const activeVehicles = myVehicles.filter(v => v.status === "active").length;
+  const pendingBookingsCount = receivedBookings.filter(b => b.status === "pending").length;
+  const totalEarnings = receivedBookings
+    .filter(b => b.status === "confirmed" || b.status === "completed")
+    .reduce((sum, b) => sum + Number(b.totalPrice), 0);
 
   return (
     <div className="min-h-screen bg-background">

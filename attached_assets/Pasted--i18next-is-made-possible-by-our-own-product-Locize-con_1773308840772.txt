@@ -1,0 +1,49 @@
+ i18next is made possible by our own product, Locize — consider powering your project with managed localization (AI, CDN, integrations): https://locize.com 💙
+content.js:1971 Failed to initialize current tab: TypeError: Cannot read properties of undefined (reading 'query')
+    at content.js:6:64856
+    at new Promise (<anonymous>)
+    at Ei (content.js:6:64828)
+    at _R.initializeCurrentTab (content.js:1971:18770)
+    at new _R (content.js:1971:18654)
+    at content.js:1971:20491
+    at content.js:4888:14616
+initializeCurrentTab @ content.js:1971Пояснение к ошибке
+content.js:6998 Failed to initialize current tab: TypeError: Cannot read properties of undefined (reading 'query')
+    at content.js:4964:64533
+    at new Promise (<anonymous>)
+    at sn (content.js:4964:64505)
+    at qf.initializeCurrentTab (content.js:6998:18770)
+    at new qf (content.js:6998:18654)
+    at content.js:6998:20491
+    at content.js:9619:164
+initializeCurrentTab @ content.js:6998Пояснение к ошибке
+index.js:1 content loaded
+index.a4962feb.js:3 Content Script: Initializing
+api/auth/me:1  Failed to load resource: the server responded with a status of 401 ()Пояснение к ошибке
+api/superadmin/impersonate-status:1  Failed to load resource: the server responded with a status of 401 ()Пояснение к ошибке
+api/bookings/my:1  Failed to load resource: the server responded with a status of 401 ()Пояснение к ошибке
+api/bookings/owner:1  Failed to load resource: the server responded with a status of 401 ()Пояснение к ошибке
+api/vehicles?ownerId=1ad5fd83-5df6-4f2e-8a12-f956df3d4fa0:1  Failed to load resource: the server responded with a status of 403 ()Пояснение к ошибке
+index-B3Yb4x1I.js:8 TypeError: m?.filter is not a function
+    at nL (index-B3Yb4x1I.js:70:3991)
+    at nf (index-B3Yb4x1I.js:6:17380)
+    at hf (index-B3Yb4x1I.js:8:3158)
+    at Bv (index-B3Yb4x1I.js:8:45369)
+    at Fv (index-B3Yb4x1I.js:8:40197)
+    at yj (index-B3Yb4x1I.js:8:40125)
+    at hc (index-B3Yb4x1I.js:8:39978)
+    at Tf (index-B3Yb4x1I.js:8:36273)
+    at Ov (index-B3Yb4x1I.js:8:37085)
+    at as (index-B3Yb4x1I.js:6:3273)
+ff @ index-B3Yb4x1I.js:8Пояснение к ошибке
+index-B3Yb4x1I.js:6 Uncaught TypeError: m?.filter is not a function
+    at nL (index-B3Yb4x1I.js:70:3991)
+    at nf (index-B3Yb4x1I.js:6:17380)
+    at hf (index-B3Yb4x1I.js:8:3158)
+    at Bv (index-B3Yb4x1I.js:8:45369)
+    at Fv (index-B3Yb4x1I.js:8:40197)
+    at yj (index-B3Yb4x1I.js:8:40125)
+    at hc (index-B3Yb4x1I.js:8:39978)
+    at Tf (index-B3Yb4x1I.js:8:36273)
+    at Ov (index-B3Yb4x1I.js:8:37085)
+    at as (index-B3Yb4x1I.js:6:3273)Пояснение к ошибке
